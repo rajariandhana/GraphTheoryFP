@@ -1,4 +1,5 @@
 import { Cell } from './cell.js';
+import { Queue } from './queue.js';
 function GetID(r,c){
     return 'cell_'+String(r).padStart(2,'0')+'_'+String(c).padStart(2,'0');
 }
@@ -36,22 +37,65 @@ function Init(){
             }
         }
     }
+    
+}
+function GenerateBombs(){
     let bombCtr=0;
     while(bombCtr<10){
         let nr = Math.floor(Math.random() * (size+1));
         let nc = Math.floor(Math.random() * (size+1));
+        // console.log(nr+" "+nc);
         let cell = cells.get(GetID(nr,nc));
-        if(cell.type == 0){
-            cell.SetType('bomb');
+        if(!cell) continue;
+        if(cell.value == 0){
+            cell.value = -1;
             bombCtr++;
         }
 
     }
+    // console.log("Bomb has been generated");
 
-    cells.forEach((value,key) => {
-        if(value.type == 'bomb') console.log(value);
+    cells.forEach((cell,cellID) => {
+        if(cell.value == -1) {
+            // console.log(cell);
+            // cell.element.textContent='B';
+            cell.neighbors.forEach(neighbor => {
+                if(neighbor.value != -1) neighbor.value++;
+                // neighbor.element.textContent = 'O';
+            });
+        }
+    });
+    cells.forEach((cell,cellID)=>{
+        cell.element.textContent = cell.value;
     });
 }
+function BFS(startCell){
+    console.log("BFSING");
+    // let visited = new Map();
+    // cells.forEach((cell) => {
+    //     visited.set(cell,false);
+    // });
+    // let q = new Queue();
+    // q.enqueue(startCell);
+    // visited.set(startCell.id,true);
 
+    // while(!q.isEmpty()){
+    //     let cur = q.front();
+    //     q.dequeue();
+    //     if(cur.value == -1) continue;
+    //     if(1<= cur.value && cur.value <= 8){
+    //         cur.Reveal();
+    //         continue;
+    //     }
+
+    //     cur.neighbors.forEach((neighbor)=>{
+    //         if(visited.get(neighbor)) return;
+    //         if(neighbor.value == -1) return;
+    //         q.enqueue(neighbor);
+    //         visited.set(neighbor,true);
+    //     });
+    // }
+}
 Init();
-console.log(cells);
+GenerateBombs();
+// console.log(cells);
