@@ -1,10 +1,19 @@
+// let isPlaying = false;
+export let Game = {
+    status: "NOT STARTED",
+    emo_bomb : '💣',
+    emo_flag : '🏴‍☠️',
+    numBombs:0,
+    flaggedBomb:0,
+}
+
 import { Cell } from './cell.js';
-import { Queue } from './queue.js';
+
 function GetID(r,c){
     return 'cell_'+String(r).padStart(2,'0')+'_'+String(c).padStart(2,'0');
 }
 let grid = document.getElementById("grid");
-let size = 10;
+let size = 12;
 let cells = new Map();
 function Init(){
     cells = new Map();
@@ -39,16 +48,25 @@ function Init(){
     }
     
 }
-function GenerateBombs(){
+export function GenerateBombs(cell){
+    // isPlaying=true;
+    // Example string
+    let regex = /^cell_(\d{2})_(\d{2})$/;
+    let match = cell.id.match(regex);
+    let cr = parseInt(match[1], 10);
+    let cc = parseInt(match[2], 10);
+
     let bombCtr=0;
-    while(bombCtr<10){
+    Game.numBombs = 12;
+    while(bombCtr<12){
         let nr = Math.floor(Math.random() * (size+1));
         let nc = Math.floor(Math.random() * (size+1));
         // console.log(nr+" "+nc);
-        let cell = cells.get(GetID(nr,nc));
-        if(!cell) continue;
-        if(cell.value == 0){
-            cell.value = -1;
+        if(Math.abs(nr-cr)<=1 || Math.abs(nc-cc)<=1) continue;
+        let ncell = cells.get(GetID(nr,nc));
+        if(!ncell) continue;
+        if(ncell.value == 0){
+            ncell.value = -1;
             bombCtr++;
         }
 
@@ -65,37 +83,22 @@ function GenerateBombs(){
             });
         }
     });
-    cells.forEach((cell,cellID)=>{
-        cell.element.textContent = cell.value;
-    });
-}
-function BFS(startCell){
-    console.log("BFSING");
-    // let visited = new Map();
-    // cells.forEach((cell) => {
-    //     visited.set(cell,false);
+    // cells.forEach((cell,cellID)=>{
+    //     cell.element.textContent = cell.value;
+    //     cell.element.textContent = cell.value==-1? emo_bomb: cell.value;
     // });
-    // let q = new Queue();
-    // q.enqueue(startCell);
-    // visited.set(startCell.id,true);
+}
+export function CheckWin(){
+    if(Game.flaggedBomb == Game.numBombs) Game.status = "WIN";
+    console.log(Game.status);
 
-    // while(!q.isEmpty()){
-    //     let cur = q.front();
-    //     q.dequeue();
-    //     if(cur.value == -1) continue;
-    //     if(1<= cur.value && cur.value <= 8){
-    //         cur.Reveal();
-    //         continue;
-    //     }
-
-    //     cur.neighbors.forEach((neighbor)=>{
-    //         if(visited.get(neighbor)) return;
-    //         if(neighbor.value == -1) return;
-    //         q.enqueue(neighbor);
-    //         visited.set(neighbor,true);
+    // if(Game.status == "WIN"){
+    //     cells.forEach((cell,cellID)=>{
+    //         cell.Disable();
     //     });
     // }
 }
+
 Init();
-GenerateBombs();
+// GenerateBombs();
 // console.log(cells);

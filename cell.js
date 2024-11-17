@@ -1,5 +1,7 @@
 import { Queue } from './queue.js';
-
+import {Game} from './main.js';
+import { GenerateBombs } from './main.js';
+import { CheckWin } from './main.js';
 export class Cell{
     constructor(id){
         this.id = id;
@@ -12,19 +14,18 @@ export class Cell{
         el.classList.add('size-12');
         el.classList.add('border');
         el.classList.add('border-gray-900');
+        el.classList.add('bg-rose-200');
+        el.classList.add('text-xl');
 
         el.addEventListener("mousedown",(event)=>this.handleMouseDown(event));
         el.addEventListener("contextmenu",(event)=>this.disableContextMenu(event));
         this.element = el;
-        // this.element.onclick = () => {
-        //     this.CellClick();
-        // };
 
         grid.appendChild(el);
     }
     handleMouseDown(event){
         if(event.button===0) this.CellClick();
-        else if(event.button===2) this.ToggleFlag();
+        else if(event.button===2 && Game.status!="NOT STARTED") this.ToggleFlag();
     }
     disableContextMenu(event){
         event.preventDefault();
@@ -34,27 +35,49 @@ export class Cell{
     }
     Reveal(){
         // console.log("revealed "+this.id);
-        if(this.status === 'REVEALED') return;
+        if(this.status == 'REVEALED') return;
         this.Unflag();
-        this.element.classList.add('bg-gray-300');
+        if(this.value!= -1){
+            this.element.classList.remove('bg-rose-200');
+            this.element.classList.add('bg-indigo-200');
+        }
+
         this.status = 'REVEALED';
+        // this.element.textContent = this.value!=0? this.value:'';
+        if(this.value == -1) this.element.textContent = Game.emo_bomb;
+        else if(this.value > 0) this.element.textContent = this.value;
+        switch (this.value) {
+            case 1: this.element.classList.add('text-blue-600'); break;
+            case 2: this.element.classList.add('text-green-600'); break;
+            case 3: this.element.classList.add('text-red-600'); break;
+            case 4: this.element.classList.add('text-purple-600'); break;
+            case 5: this.element.classList.add('text-orange-600'); break;
+            case 6: this.element.classList.add('text-aqua-600'); break;
+            case 7: this.element.classList.add('text-pink-600'); break;
+            case 8: this.element.classList.add('text-brown-600'); break;
+        
+            default:
+                this.element.classList.add('text-black');
+                break;
+        }
         // this.element.style.background = '#fefefe';
     }
     // Color(''){
         // this.
     // }
     CellClick(){
-        console.log("click");
-        if(this.status === 'REVEALED') return;
-        else if(this.value == -1){
+        if(Game.status == "NOT STARTED") {GenerateBombs(this);Game.status="PLAYING";}
+        else if(Game.status == "WIN" || Game.status == "LOST" || this.status == 'REVEALED' || this.status == "FLAG") return;
+
+        this.Reveal();
+        if(this.value == -1){
+            Game.status = "LOST";
             console.log("HIT BOMB GAME OVER");
         }
         else if(1<= this.value && this.value<=8){
-            this.Reveal();
             console.log("angka "+this.value);
         }
         else{
-            this.Reveal();
             let visited = new Map();
             let q = new Queue();
             q.enqueue(this);
@@ -77,18 +100,22 @@ export class Cell{
         }
     }
     ToggleFlag(){
-        if(this.status === 'REVEALED') return;
+        if(Game.status == "WIN" || Game.status == "LOST" || this.status == 'REVEALED') return;
+
         else if(this.status === 'FLAG') this.Unflag();
         else if(this.status === 'HIDDEN') this.Flag();
     }
     Unflag(){
-        this.element.textContent = this.value;
-        this.status = 'HIDDEN';
         console.log("UNFLAG");
+        this.element.textContent = this.value>0? this.value : '';
+        this.status = 'HIDDEN';
+        if(this.value == -1) Game.flaggedBomb--;
     }
     Flag(){
-        this.element.textContent = 'F';
-        this.status = 'FLAG';
         console.log("FLAG");
+        this.element.textContent = Game.emo_flag;
+        this.status = 'FLAG';
+        if(this.value == -1) Game.flaggedBomb++;
+        CheckWin();
     }
 }
