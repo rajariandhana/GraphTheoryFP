@@ -4,13 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minesweeper</title>
-    <!-- <link rel="stylesheet" href="/output.css"> -->
+    <link rel="stylesheet" href="index.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Honk&family=Jacquard+12&display=swap');
+    </style>
 </head>
-<body class="bg-gray-900 text-gray-900 flex w-full h-screen justify-center items-center">
-    <div class="grid grid-cols-12 bg-indigo-200 p-4 rounded-md shadow-md" id="grid">
+<body class="flex flex-col items-center justify-center w-full h-screen text-white bg-gray-900">
+    <h1 id="title" class="text-7xl">Minesweeper</h1>
+    <span id="timeDisplay" class="text-2xl text-gray-900">00:00:00</span>
+    <span id="n_mines" class="text-2xl text-gray-900">Mines</span>
+    <div class="grid grid-cols-12 p-4 my-4 bg-indigo-200 rounded-md shadow-md" id="grid">
         
     </div>
+    <a id="reset" class="px-12 py-2 font-semibold bg-indigo-500 rounded-md" href="/">RESET</a>
+    <!-- <a id="mode" href="javascript:void(0)" onclick="Mode()">Mode: 💣</a> -->
     <script src="main.js" type="module"></script>
+    <script src="stopwatch.js"></script>
+
 </body>
 </html>

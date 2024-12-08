@@ -5,6 +5,8 @@ export let Game = {
     emo_flag : '🏴‍☠️',
     numBombs:0,
     flaggedBomb:0,
+    revealed:0,
+    target:0
 }
 
 import { Cell } from './cell.js';
@@ -12,7 +14,10 @@ import { Cell } from './cell.js';
 function GetID(r,c){
     return 'cell_'+String(r).padStart(2,'0')+'_'+String(c).padStart(2,'0');
 }
+let n_mines = document.getElementById('n_mines');
 let grid = document.getElementById("grid");
+let reset = document.getElementById('reset');
+reset.style.display = 'none';
 let size = 12;
 let cells = new Map();
 function Init(){
@@ -58,6 +63,7 @@ export function GenerateBombs(cell){
 
     let bombCtr=0;
     Game.numBombs = 12;
+    Game.target = (Game.numBombs*Game.numBombs)-Game.numBombs;
     while(bombCtr<12){
         let nr = Math.floor(Math.random() * (size+1));
         let nc = Math.floor(Math.random() * (size+1));
@@ -87,11 +93,29 @@ export function GenerateBombs(cell){
     //     cell.element.textContent = cell.value;
     //     cell.element.textContent = cell.value==-1? emo_bomb: cell.value;
     // });
-}
-export function CheckWin(){
-    if(Game.flaggedBomb == Game.numBombs) Game.status = "WIN";
-    console.log(Game.status);
+    n_mines.textContent = 'There are '+Game.numBombs+' '+Game.emo_bomb;
+    n_mines.classList.remove('text-gray-900');
+    timeDisplay.classList.remove('text-gray-900');
+    reset.style.display = 'flex';
+    StartStopwatch();
 
+    // reset.classList.remove('hidden');
+    // n_mines.classList.remove('hidden');
+}
+export function CheckStatus(){
+    // if(Game.status=="PLAYING") return;
+
+    // console.log(Game.status);
+    // console.log(Game.target+" "+Game.revealed);
+    if(Game.status == "WIN" || Game.flaggedBomb == Game.numBombs || Game.target==Game.revealed){
+        Game.status = "WIN";
+        StopStopwatch();
+        reset.textContent = 'You win! play again';
+    }
+    else if(Game.status=="LOST"){
+        StopStopwatch();
+        reset.textContent = 'Oh no you lost, go play again';
+    }
     // if(Game.status == "WIN"){
     //     cells.forEach((cell,cellID)=>{
     //         cell.Disable();

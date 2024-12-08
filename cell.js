@@ -1,7 +1,7 @@
 import { Queue } from './queue.js';
 import {Game} from './main.js';
 import { GenerateBombs } from './main.js';
-import { CheckWin } from './main.js';
+import { CheckStatus } from './main.js';
 export class Cell{
     constructor(id){
         this.id = id;
@@ -40,6 +40,8 @@ export class Cell{
         if(this.value!= -1){
             this.element.classList.remove('bg-rose-200');
             this.element.classList.add('bg-indigo-200');
+            Game.revealed++;
+            CheckStatus();
         }
 
         this.status = 'REVEALED';
@@ -60,12 +62,17 @@ export class Cell{
                 this.element.classList.add('text-black');
                 break;
         }
+
         // this.element.style.background = '#fefefe';
     }
     // Color(''){
         // this.
     // }
-    CellClick(){
+
+    delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+      }
+    async CellClick(){
         if(Game.status == "NOT STARTED") {GenerateBombs(this);Game.status="PLAYING";}
         else if(Game.status == "WIN" || Game.status == "LOST" || this.status == 'REVEALED' || this.status == "FLAG") return;
 
@@ -73,6 +80,7 @@ export class Cell{
         if(this.value == -1){
             Game.status = "LOST";
             console.log("HIT BOMB GAME OVER");
+            CheckStatus();
         }
         else if(1<= this.value && this.value<=8){
             console.log("angka "+this.value);
@@ -96,6 +104,8 @@ export class Cell{
                     }
 
                 });
+                await this.delay(100);
+
             }
         }
     }
@@ -116,6 +126,6 @@ export class Cell{
         this.element.textContent = Game.emo_flag;
         this.status = 'FLAG';
         if(this.value == -1) Game.flaggedBomb++;
-        CheckWin();
+        CheckStatus();
     }
 }
